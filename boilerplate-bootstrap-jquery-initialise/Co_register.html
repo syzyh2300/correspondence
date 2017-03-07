@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+        <meta content="width=device-width,initial-scale=1" name="viewport">
+        <title>New Correspondence</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+        <link href="css/navbar-fixed-top.css" rel="stylesheet">
+        <link href="css/customcss.css" rel="stylesheet">
+        <link href="favicon.ico" rel="icon">
+        <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">        
+        <script src="js/jquery-3.1.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+
+        <script src="js/cognito.js"></script> <!-- Login cognito -->
+
+         <script src="js/callLambda.js"></script>  <!--new correspondence -->
+
+        <script type="text/javascript" src="js/dragfile.js"></script>
+        <!-- file input js -->
+
+        <script src="js/aws/jsbn.js"></script>
+        <script src="js/aws/jsbn2.js"></script>
+        <script src="js/aws/sjcl.js"></script>
+        <script src="js/aws/moment.js"></script>
+        <script src="js/aws/aws-cognito-sdk.min.js"></script>
+        <script src="js/aws/amazon-cognito-identity.min.js"></script>
+        <script src="js/aws/aws-sdk.min.js"></script>
+        
+        <style>
+        </style>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+
+		
+
+        <script type="text/javascript">
+	        $(document).ready( function(){
+
+	        	var options={
+	        		dateFormat: 'yy-m-d',
+	        		todayHighlight : true,
+	        		todayBtn: true,
+	        		autoclose: true
+	        	};
+	        	$('#dateinline').datepicker(options);
+	        })
+    	</script>
+	</head>
+
+	<body>
+		<!-- Fixed navbar -->
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+          <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">ISGM</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">Sing Out</a></li>
+                </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div class = "container-fluid">
+            <div class = "row">
+                <div class = "col-sm-12  col-md-12  main">
+                    <h1 class = "page-header ">New Correspondence</h1> 
+                    <div class = "col-sm-12 col-md-12">
+                        <h4 class = "sub-header">Recieved Item...</h4>
+                        <div class = "container-fluid panel panel-default col-xs-12 col-sm-12 col-md-12" style= "padding-top: 25px">
+
+                            <div class = "container-fluid col-xs-12 col-sm-6 col-md-6">
+                            	<div class="form-horizontal">
+                            		<div class="form-group">
+                            			<label class = "col-sm-2 col-md-2">Status</label>
+	                                    <div class="col-sm-4 col-md-4 ">
+	                                        <select class = "form-control" id = "Status_value">
+	                                            <option value ="1">Open</option>
+	                                            <option value = "0" >Completed</option>
+	                                        </select>
+	                                    </div>
+                            		</div> 
+                                </div>
+                                <form class="form-horizontal">	                                   
+	                                  <div class="form-group">
+	                                        <label class = "col-sm-2 col-md-2">Type</label>
+                                            <div class="col-sm-4 col-md-4 ">
+                                                <div class = "radio" id = "type_value">
+                                                	<label>
+                                                		<input type="radio" name="Type1" Value ="Email">Email
+                                                	</label>
+                                                	<label>
+                                                		<input type="radio" name="Type1" Value = "Letter">Letter
+                                                	</label>
+                                                	<label>
+                                                		<input type="radio" name="Type1" Value = "Other">Other
+                                                	</label>
+                                                </div>
+                                            </div>
+	                                  </div>
+	                                  <div class="form-group">
+	                                        <label class = "col-sm-2 col-md-2">Description</label>
+                                            <div class="col-sm-8 col-md-8 ">
+                                                <textarea class="form-control" rows="5" id = "Description_value"></textarea>
+                                            </div>
+	                                  </div>
+	                                  <div class="form-group" >
+	                                        <label class = "col-sm-2 col-md-2" >Sent Date</label>
+                                            <div class="col-sm-4 col-md-4 " style = "font-size:12px" id="dateinline">
+                                            </div>
+	                                  </div>
+	                                  <div class="form-group">
+	                                        <label class = "col-sm-2 col-md-2">Sent From</label>
+                                          	<div class = "col-sm-8 col-md-6">
+                                          		<input class="form-control " type="name" placeholder="Person" id = "sent_From_Person">
+                                            	<input class="form-control " type="name" placeholder="Company" id = "sent_From_Company">
+                                          	</div>
+                                            
+	                                  </div>
+	                                  <div class="form-group">
+	                                        <label class = "col-sm-2 col-md-2">Sent To</label>
+                                          		<div class = "col-sm-8 col-md-6">
+                                          			<input class="form-control " type="name" placeholder="Person(s)" id = "sent_To_Person">
+                                            		<input class="form-control " type="name" placeholder="Company(s)" id = "sent_To_Company">
+                                          		</div>
+                                            
+	                                  </div>
+
+                                </form>
+                            </div>
+
+                            <div class = "container-fluid col-xs-12 col-sm-6 col-md-6">
+                                <form class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class = "col-sm-2 col-md-2">Artifacts</label>
+                                        <div class=" col-sm-8 col-md-8 ">
+                                        	<input type="file" name="input4" id="input4"  multiple >
+                                        	<!--<label class = "btn btn-default btn-file">
+                                        		click to select <input type="file" name="input4" id = "input4" multiple>
+                                        	</label> -->                                     	
+                                        	<br/>
+											<div class='bfd-dropfield' id="outfiledrop" style="padding-top:20px; font-size: 32px;">
+												<div class='bfd-dropfield-inner'  id = "filedrop" style="text-align: center; height: 350px; padding-top: 143px">or drop files here</div>
+											</div>
+											<div class='container-fluid bfd-files' id="filedata">
+											</div>
+                                            
+                                        </div>
+                                    </div>
+                                    
+                                </form>
+                            </div>
+
+                        </div>
+                        <p type ="button" class = "btn btn-primary btn-lg pull-right" id = "submit_newcoorespondence">Submit</p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+	</body>
+</html>

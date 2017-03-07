@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta charset="UTF-8">
+        <meta content="width=device-width,initial-scale=1" name="viewport">
+		<title>New User Registration</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+        <link href="css/navbar-fixed-top.css" rel="stylesheet">
+        <link href="css/login.css" rel="stylesheet">	
+
+        <link href="favicon.ico" rel="icon">
+        <script src="js/jquery-3.1.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/cognito.js"></script>     
+        <script src="js/login.js"></script>
+
+        <script src="js/aws/jsbn.js"></script>
+        <script src="js/aws/jsbn2.js"></script>
+        <script src="js/aws/sjcl.js"></script>
+        <script src="js/aws/moment.js"></script>
+        <script src="js/aws/aws-cognito-sdk.min.js"></script>
+        <script src="js/aws/amazon-cognito-identity.min.js"></script>
+        <script src="js/aws/aws-sdk.min.js"></script>
+        
+        <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+	</head>
+
+	<body>
+        <!-- Fixed navbar -->
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+          <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">ISGM</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#" data-toggle="modal" data-target= "#login-modal">Login</a></li>
+                </ul>
+            </div>
+          </div>
+        </nav>
+
+        <!-- <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+          <div class="modal-dialog">
+                <div class="loginmodal-container">
+                    <h1>Login to Your Account</h1><br>
+                  <form> 
+                    
+                    <input type="email" name="email" id = "email1" placeholder="Email" value = "Peng2300@gmail.com">
+                    <input type="password" name="pass" id= "password1" placeholder="Password" value="Test123$">
+                    <input type="button" name="login" class="btn btn-default btn-primary btn-lg" id="submit1" value="Login"></input>
+
+                  </form>
+                    
+                  <div class="login-help">
+                    <a href="#">Register</a> - <a href="#">Forgot Password</a>
+                  </div>
+                </div>
+            </div>
+          </div> -->
+
+        <div class="container">
+	    	<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="panel panel-login">
+						<div class="panel-heading">
+							<div class="row">
+								<div class="col-xs-6">
+									<a href="#" class="active" id="login-form-link">Login</a>
+								</div>
+								<div class="col-xs-6">
+									<a href="#" id="register-form-link">Register</a>
+								</div>
+							</div>
+							<hr>
+						</div>
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-lg-12">
+									<form id="login-form"  method="post" role="form" style="display: block;">
+										<div class="form-group">
+											<input type="email" name="email1" id="email1" tabindex="1" class="form-control" placeholder="Email" value="Peng2300@gmail.com">
+										</div>
+										<div class="form-group">
+											<input type="password" name="pass" id="password1" tabindex="2" class="form-control" placeholder="Password" value = "Test123$">
+										</div>
+										<!-- <div class="form-group text-center">
+											<input type="checkbox" tabindex="3" class="" name="remember" id="remember">
+											<label for="remember"> Remember Me</label>
+										</div> -->
+										<div class="form-group">
+											<div class="row">
+												<div class="col-sm-6 col-sm-offset-3">
+													<input type="button" name="login-submit" id="submit1" tabindex="4" class="form-control btn btn-login" value="Log In">
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="text-center">
+														<a href="#" tabindex="5" class="forgot-password">Forgot Password?</a>
+													</div>
+												</div>
+											</div>
+										</div>
+									</form>
+									<form id="register-form"  method="post" role="form" style="display: none;">
+										<div class="form-group">
+											<input type="text" name="FirstName" id="FirstName" tabindex="1" class="form-control" placeholder="FirstName" value="">
+										</div>
+										<div class="form-group">
+											<input type="text" name="FamilyName" id="FamilyName" tabindex="1" class="form-control" placeholder="FamilyName" value="">
+										</div>
+										<div class="form-group">
+											<input type="email" name="email2" id="email2" tabindex="1" class="form-control" placeholder="Email Address" value="">
+										</div>
+										<div class="form-group">
+											<input type="password" name="password2" id="password2" tabindex="2" class="form-control" placeholder="Password">
+										</div>
+										<div class="form-group">
+											<input type="password" name="confirm-password" id="confirm-password" tabindex="2" class="form-control" placeholder="Confirm Password">
+										</div>
+										<div class="form-group">
+											<div class="row">
+												<div class="col-sm-6 col-sm-offset-3">
+													<input type="button" name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Register Now">
+												</div>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>        
+	</body>
+</html>
