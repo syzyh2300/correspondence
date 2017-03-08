@@ -31,7 +31,7 @@ $(document).on("click", "#submit1", function(){
             var AWS_Region = "us-west-2";
             var AWS_IdentityPoolId = "us-west-2:df08250b-a24c-4a6c-826c-e3bb2ae75d63";
             var AWS_UserPoolId = "us-west-2_boi1yXUkS";
-
+            
             var AWS_Logins = {'cognito-idp.us-west-2.amazonaws.com/us-west-2_boi1yXUkS' : AWS_idToken}
 
             AWS.config.region = AWS_Region;
