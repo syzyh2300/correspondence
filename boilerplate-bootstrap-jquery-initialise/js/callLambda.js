@@ -9,14 +9,11 @@ $(document).on("click", "#submit_newcoorespondence", function(){
     var sentFromCompany = $("#sent_From_Company").val();
     var sentToPerson = $("#sent_To_Person").val();
     var sentToCompany = $("#sent_To_Company").val();
-
-
-    
-
-
+    var correspendenceID = $('#submit_newcoorespondence').attr("data-correspendence-id");
     var checkstatus = 1;//for further checking user ID
 
-    var sprocString = "call insert_new_correspondence(" +statusValue+ ",'" +typeValue+ "','" +descriptionValue+ "','" +dateValue+ "','" +sentToPerson+ "','" +sentToCompany+ "','" +sentFromPerson+ "','" +sentFromCompany+ "'," +checkstatus+ ");"; 
+    //call stored persedure
+    var sprocString = "call insert_new_correspondence(" +correspendenceID+ "," +statusValue+ ",'" +typeValue+ "','" +descriptionValue+ "','" +dateValue+ "','" +sentToPerson+ "','" +sentToCompany+ "','" +sentFromPerson+ "','" +sentFromCompany+ "'," +checkstatus+ ");"; 
 
     var data = { UserPoolId : 'us-west-2_boi1yXUkS',
             ClientId : '28vv7qns6eobvm2rdvqino0dcu'
@@ -44,7 +41,6 @@ $(document).on("click", "#submit_newcoorespondence", function(){
             AWS.config.credentials.get(function(){
                 insertdata(sprocString);
             }); // end credentials.get
-
         });
     }
     else{
@@ -79,6 +75,11 @@ function insertdata(sprocString){
         }); // end lambda.invoke
 
 }
+
+
+
+
+
 
 function insertfiles(){
     var inputlength = document.getElementById('input4').files.length;
@@ -141,6 +142,7 @@ function executeSproc(sprocString){
                     var sproc_EventId   = pullResults.respon[0][0].Event_ID;
                     console.log(sproc_Response);
                     console.log(sproc_EventId);
+
                 } // end if
         }); // end lambda.invoke
 
@@ -165,5 +167,26 @@ function saveFilesName(files){
 }
 
 
+function getSearchParams(k){
+            var p = {};
+            location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(s,k,v){p[k]=v})
+            return k?p[k]:p;
+}
 
+$(document).ready(function(){
+   var correspondenceID = getSearchParams("correspondenceID");
+   if(correspondenceID){
+       $("#submit_newcoorespondence").attr("data-correspendence-id",correspondenceID);
+       retrivingdata();
+   }
+ 
+        
+
+});
+
+//retriving data from database ************************************
+
+function retrivingdata(){
+
+}
 

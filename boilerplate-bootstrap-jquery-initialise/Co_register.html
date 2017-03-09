@@ -44,8 +44,10 @@
 	        		todayHighlight : true,
 	        		todayBtn: true,
 	        		autoclose: true
+
 	        	};
 	        	$('#dateinline').datepicker(options);
+                $('#dateinline').datepicker("setDate", new Date());
 	        })
     	</script>
 	</head>
@@ -162,7 +164,7 @@
                             </div>
 
                         </div>
-                        <p type ="button" class = "btn btn-primary btn-lg pull-right" id = "submit_newcoorespondence">Submit</p>
+                        <p type ="button" class = "btn btn-primary btn-lg pull-right" id = "submit_newcoorespondence" data-correspendence-id="0">Submit</p>
                     </div>
                     
                 </div>

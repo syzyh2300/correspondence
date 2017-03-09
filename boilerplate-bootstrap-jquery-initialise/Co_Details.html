@@ -14,6 +14,29 @@
         <script src="js/bootstrap.min.js"></script>
         <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 
+        <script type="text/javascript">
+        function editdata(){
+            document.getElementById("edit1").href = "";
+
+        }
+
+        function getSearchParams(k){
+            var p = {};
+            location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(s,k,v){p[k]=v})
+            return k?p[k]:p;
+        }
+
+        $(document).ready(function(){
+           var correspondenceID = getSearchParams("correspondenceID");
+           if(correspondenceID){
+               //console.log("correspondenceID is: "+correspondenceID);
+               $("#edit1").attr("href","Co_register.html?correspondenceID="+correspondenceID);
+           }
+
+
+        });
+
+        </script>
         <style>
         </style>
     </head>
@@ -55,10 +78,7 @@
                                    <div class="form-group">
                                         <label class = "col-sm-2 col-md-2">Status</label>
                                             <div class="col-sm-4 col-md-4 ">
-                                                <select class = "form-control">
-                                                    <option>Open</option>
-                                                    <option>Completed</option>
-                                                </select>
+                                                <p>Open</p>
                                             </div>
                                   </div>
                                   <div class="form-group">
@@ -104,7 +124,7 @@
                                         </div>
                                     </div>
                                     <div class = "form-group ">
-                                        <a href="#" class="btn btn-default btn-primary pull-right ">Edit</a>
+                                        <a href="Co_register.html" class="btn btn-default btn-primary pull-right " id = "edit1" >Edit</a>
                                     </div>
                                 </form>
                             </div>
@@ -180,7 +200,7 @@
                                             <a href="#">
                                                <span class="glyphicon glyphicon-trash "></span>  
                                             </a>
-                                            <a href="#">
+                                            <a href="">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                             </a>
                                         </div>
