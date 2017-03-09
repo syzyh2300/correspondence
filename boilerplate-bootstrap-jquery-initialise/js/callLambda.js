@@ -68,6 +68,7 @@ function insertdata(sprocString){
 
                 if (error) { console.log(error);
                 } else {
+
                     var pullResults = JSON.parse(data.Payload);
                     var sproc_Response  = pullResults.respon[0][0].RESPONSE;
                     var sproc_EventId   = pullResults.respon[0][0].Event_ID;
@@ -82,9 +83,66 @@ function insertdata(sprocString){
 function insertfiles(){
     var inputlength = document.getElementById('input4').files.length;
     if (inputlength != 0 ) {
-        var artifacts = saveFilesName(document.getElementById('input4').files);
-        //working stop point 8/3/2017 5:23*****************************************************
+        
+        var artifacts = document.getElementById('input4').files;
+        var sprocString;
+        var name;
+        var GUID;
+        var params;
+        var GUID_filename = new Array();
+        var s3 = new AWS.S3({
+                region: 'ap-southeast-2',
+                apiVersion: '2006-03-01',
+                params: {Bucket: 'correspendence'}
+                });
+
+
+        for (var i = 0; i < artifacts.length; i++){
+            
+            name = artifacts[i].name;
+            GUID = saveFilesName();
+            params = {Key : GUID, Body : artifacts[i], ACL: 'public-read'};
+            GUID_filename[GUID] = name;
+
+            s3.upload (params, function(err,data){
+                if(err){
+                    console.log(err.message);
+                }
+                else{
+
+                    GUID = data.key;
+                    name = GUID_filename[data.key];
+                    sprocString = "call insert_new_files('" +name+ "','" +GUID+ "'," +1+");";
+                    console.log("sprocString: "+ sprocString);
+                    executeSproc(sprocString);
+                }
+            })
+        }
     }
+
+}
+function executeSproc(sprocString){
+        var tsting = sprocString;
+        var AWS_Region = "us-west-2";
+        var lambda = new AWS.Lambda({region: AWS_Region, apiVersion: '2015-03-31'}); 
+
+        var payload_JSON = {"sproc": tsting }; // create JSON object for parameters for invoking Lambda function
+        var payload_String = JSON.stringify(payload_JSON)
+        var pullParams = { FunctionName : 'test123', Payload : payload_String }; // http://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html ref this for synchronous / asynchronous
+        var pullResults; // create variable to hold data returned by the Lambda function
+
+        lambda.invoke(pullParams, function(error, data) {
+
+                if (error) { console.log(error);
+                } else {
+
+                    var pullResults = JSON.parse(data.Payload);
+                    var sproc_Response  = pullResults.respon[0][0].RESPONSE;
+                    var sproc_EventId   = pullResults.respon[0][0].Event_ID;
+                    console.log(sproc_Response);
+                    console.log(sproc_EventId);
+                } // end if
+        }); // end lambda.invoke
 
 }
 
@@ -103,7 +161,7 @@ function S4() {
 function saveFilesName(files){
 
     var guid = (S4() + S4() + "-" + S4() + "-4" + S4().substr(0,3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
-
+    return guid;
 }
 
 
