@@ -41,27 +41,27 @@ $(document).on("click", "#submit1", function(){
                             		});
             alert("Login success");
 
-            var s3 = new AWS.S3({
-                region: 'ap-southeast-2',
-                apiVersion: '2006-03-01',
-                params: {Bucket: 'correspendence'
-                        },
+            // var s3 = new AWS.S3({
+            //     region: 'ap-southeast-2',
+            //     apiVersion: '2006-03-01',
+            //     params: {Bucket: 'correspendence'
+            //             },
 
-            });
+            // });
             
 
 
 
             // *********************************************s3 files download works
-            s3.getObject({Bucket:'correspendence' , Key: '5678.txt'},
-                function (error, data) {
-                if (error != null) {
-                  alert("Failed to retrieve an object: " + error);
-                } else {
-                  alert("Loaded " + data.ContentLength + " bytes");
-                  // do something with data.body
-                }
-                });
+            // s3.getObject({Bucket:'correspendence' , Key: '5678.txt'},
+            //     function (error, data) {
+            //     if (error != null) {
+            //       alert("Failed to retrieve an object: " + error);
+            //     } else {
+            //       alert("Loaded " + data.ContentLength + " bytes");
+            //       // do something with data.body
+            //     }
+            //     });
 
             //***********************************************s3 files list works
             // s3.listObjects(function (err, data) {
