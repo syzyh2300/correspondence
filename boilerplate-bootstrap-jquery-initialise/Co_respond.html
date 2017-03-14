@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+        <meta content="width=device-width,initial-scale=1" name="viewport">
+        <title id = "title1">New Response</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+        <link href="css/navbar-fixed-top.css" rel="stylesheet">
+        <link href="css/customcss.css" rel="stylesheet">
+        <link href="favicon.ico" rel="icon">
+        <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">        
+        <script src="js/jquery-3.1.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+
+        <script src="js/cognito.js"></script> <!-- Login cognito -->
+
+        <script type="text/javascript" src="js/dragfile.js"></script>
+        <!-- file input js -->
+
+        <script src="js/aws/jsbn.js"></script>
+        <script src="js/aws/jsbn2.js"></script>
+        <script src="js/aws/sjcl.js"></script>
+        <script src="js/aws/moment.js"></script>
+        <script src="js/aws/aws-cognito-sdk.min.js"></script>
+        <script src="js/aws/amazon-cognito-identity.min.js"></script>
+        <script src="js/aws/aws-sdk.min.js"></script>
+        
+        <style>
+        </style>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+
+		<!-- datepicker -->
+        <script type="text/javascript">
+	        $(document).ready( function(){
+
+	        	var options={
+	        		dateFormat: 'yy-m-d',
+	        		todayHighlight : true,
+	        		todayBtn: true,
+	        		autoclose: true
+
+	        	};
+	        	$('#dateinline').datepicker(options);
+                $('#dateinline').datepicker("setDate", new Date());
+	        })
+    	</script>
+
+    	<!-- form control -->
+    	<script type="text/javascript">
+    		$(document).on("click", "#submit_newresponse", function(){
+
+			    var descriptionValue = $("#Description_value").val();
+			    var dateValue = getinputdate($("#dateinline").datepicker('getDate'));
+			    var sentFromPerson = $("#sent_From_Person").val();
+			    var sentFromCompany = $("#sent_From_Company").val();
+
+			    //user should not allow to edit response
+			    // var ResponseID = $('#submit_newresponse').attr("data-Response-id");
+
+			    var correspendenceID = $('#submit_newresponse').attr("data-correspendence-id");
+			    var checkstatus = 2;//for further checking user ID
+
+			    //call stored persedure
+			    var sprocString = "call insert_new_response(" +correspendenceID+ ",'" +descriptionValue+ "','" +dateValue+ "','" +sentFromPerson+ "','" +sentFromCompany+ "'," +checkstatus+ ");"; 
+
+			    var data = { UserPoolId : 'us-west-2_boi1yXUkS',
+			            ClientId : '28vv7qns6eobvm2rdvqino0dcu'
+			        };
+			    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+			    var cognitoUser = userPool.getCurrentUser();
+
+			    if (cognitoUser != null) {
+			        cognitoUser.getSession(function(err, session) {
+			            if (err) {
+			                alert(err);
+			                return;
+			            }
+			            console.log('session validity: ' + session.isValid());
+			            var AWS_Region = "us-west-2";
+			            var AWS_idToken = session.getIdToken().getJwtToken();
+			            var AWS_Logins = {'cognito-idp.us-west-2.amazonaws.com/us-west-2_boi1yXUkS' : AWS_idToken}
+			            var AWS_IdentityPoolId = "us-west-2:df08250b-a24c-4a6c-826c-e3bb2ae75d63";
+			            var AWS_UserPoolId = "us-west-2_boi1yXUkS";
+			            AWS.config.region      = AWS_Region;
+			            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+			                                    IdentityPoolId : AWS_IdentityPoolId, 
+			                                            Logins : AWS_Logins
+			                                    });
+			            AWS.config.credentials.get(function(){
+			                insertdata(sprocString,insertfiles);
+			                
+			            }); // end credentials.get
+			        });
+			    }
+			    else{
+			        alert("Please login in");
+			        return;
+			    }
+
+			});
+
+			function insertdata(sprocString,callback){
+
+		        var tsting = sprocString;
+		        var AWS_Region = "us-west-2";
+		        var lambda = new AWS.Lambda({region: AWS_Region, apiVersion: '2015-03-31'}); 
+
+		        var payload_JSON = {"sproc": tsting }; // create JSON object for parameters for invoking Lambda function
+		        var payload_String = JSON.stringify(payload_JSON)
+		        var pullParams = { FunctionName : 'test123', Payload : payload_String }; // http://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html ref this for synchronous / asynchronous
+		        var pullResults; // create variable to hold data returned by the Lambda function
+
+		        lambda.invoke(pullParams, function(err,data){
+		            callback(err,data);
+
+		        }); // end lambda.invoke
+
+			}
+
+			function insertfiles(err,data){
+			    if(err){console.log(err)}
+			    else{
+			        var inputlength = document.getElementById('input4').files.length;
+			        if (inputlength != 0 ) {
+			            
+			            var artifacts = document.getElementById('input4').files;
+			            var sprocString;
+			            var name;
+			            var GUID;
+			            var params;
+			            var GUID_filename = new Array();
+			            var s3 = new AWS.S3({
+			                    region: 'ap-southeast-2',
+			                    apiVersion: '2006-03-01',
+			                    params: {Bucket: 'correspendence'}
+			                    });
+			            
+			            var pullResults = JSON.parse(data.Payload);
+			            var result = pullResults.respon[0][0];
+			            var correspondenceid = $('#submit_newresponse').attr("data-correspendence-id"); 
+			            var responseid = result["LAST_INSERT_ID()"];
+			            for (var i = 0; i < artifacts.length; i++){
+			                
+			                name = artifacts[i].name;
+			                GUID = saveFilesName();
+			                params = {Key : GUID, Body : artifacts[i], ACL: 'public-read'};
+			                GUID_filename[GUID] = name;
+
+			                s3.upload (params, function(err,data){
+			                    if(err){
+			                        console.log(err.message);
+			                    }
+			                    else{
+
+			                        GUID = data.key;
+			                        name = GUID_filename[data.key];
+			                        sprocString = "call insert_new_files('" +name+ "','" +GUID+ "'," +correspondenceid+","+responseid+ ","+2+");";
+			                        console.log("sprocString: "+ sprocString);
+			                        executeSproc(sprocString, generalcheck);
+			                    }
+			                })
+			            }
+			        }       
+			    }
+
+			}
+
+			function generalcheck(err,data){
+			    if (err) { console.log(error);
+			                } 
+			    else {
+
+			        var pullResults = JSON.parse(data.Payload);
+			        var sproc_Response  = pullResults.respon[0][0].RESPONSE;
+			        var sproc_EventId   = pullResults.respon[0][0].Event_ID;
+			        console.log(sproc_Response);
+			        console.log(sproc_EventId);
+			    }
+			}
+
+			function executeSproc(sprocString, callback){
+		        var tsting = sprocString;
+		        var AWS_Region = "us-west-2";
+		        var lambda = new AWS.Lambda({region: AWS_Region, apiVersion: '2015-03-31'}); 
+		        var payload_JSON = {"sproc": tsting }; // create JSON object for parameters for invoking Lambda function
+		        var payload_String = JSON.stringify(payload_JSON)
+		        var pullParams = { FunctionName : 'test123', Payload : payload_String }; // http://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html ref this for synchronous / asynchronous
+		        var pullResults; // create variable to hold data returned by the Lambda function
+
+		        lambda.invoke(pullParams, function(error, data) {
+		                callback(error, data);
+		        }); // end lambda.invoke
+			}
+
+			$(document).ready(function(){
+			    var correspondenceID = getSearchParams("correspondenceID");
+			    var ResponseID = getSearchParams("responseID");
+			    if(correspondenceID){
+			       $("#submit_newresponse").attr("data-correspendence-id",correspondenceID);
+			       // $("#title1").text("Response Update");
+			       // $("#h1id").text("Response Update");
+			       //  var data = { UserPoolId : 'us-west-2_boi1yXUkS',
+			       //      ClientId : '28vv7qns6eobvm2rdvqino0dcu'
+			       //  };
+			       //  var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+			       //  var cognitoUser = userPool.getCurrentUser();
+
+			       //  if (cognitoUser != null) {
+			       //      cognitoUser.getSession(function(err, session) {
+			       //          if (err) {
+			       //              alert(err);
+			       //              return;
+			       //          }
+			       //          console.log('session validity: ' + session.isValid());
+			       //          var AWS_Region = "us-west-2";
+			       //          var AWS_idToken = session.getIdToken().getJwtToken();
+			       //          var AWS_Logins = {'cognito-idp.us-west-2.amazonaws.com/us-west-2_boi1yXUkS' : AWS_idToken}
+			       //          var AWS_IdentityPoolId = "us-west-2:df08250b-a24c-4a6c-826c-e3bb2ae75d63";
+			       //          var AWS_UserPoolId = "us-west-2_boi1yXUkS";
+			       //          AWS.config.region      = AWS_Region;
+			       //          AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+			       //                                  IdentityPoolId : AWS_IdentityPoolId, 
+			       //                                          Logins : AWS_Logins
+			       //                                  });
+			       //          AWS.config.credentials.get(function(){
+			       //              retrivingdata(correspondenceID);
+			       //          }); // end credentials.get
+			       //      });
+			       //  }
+			       //  else{
+			       //      alert("Please login in");
+			       //      return;
+			       //  }
+			       
+			   }
+			});
+
+			function retrivingdata(correspondenceID){
+			    var id = correspondenceID;
+			    var sprocString = "call select_data(" +id+ "," +1+ ");";
+			    executeSproc(sprocString, populateForm_callback);
+			}
+
+			function getinputdate(date){
+			    var datestring = date.getDate() + "-" + (date.getMonth() + 1) + "-" + (date.getFullYear());
+			    return datestring
+			}
+
+			//to create GUID for files(or other use)
+			function S4() {
+			    return (((1+Math.random())*0x10000)|0).toString(16).substring(1); 
+			}
+
+			function saveFilesName(files){
+
+			    var guid = (S4() + S4() + "-" + S4() + "-4" + S4().substr(0,3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
+			    return guid;
+			}
+
+
+			function getSearchParams(k){
+			            var p = {};
+			            location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(s,k,v){p[k]=v})
+			            return k?p[k]:p;
+			}
+    	</script>
+	</head>
+
+	<body>
+		<!-- Fixed navbar -->
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+          <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index">ISGM</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">Sing Out</a></li>
+                </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div class = "container-fluid">
+            <div class = "row">
+                <div class = "col-sm-12  col-md-12  main">
+                    <h1 class = "page-header" id = "h1id">New Response</h1> 
+                    <div class = "col-sm-12 col-md-12">
+                        <h4 class = "sub-header">Recieved Item...</h4>
+                        <div class = "container-fluid panel panel-default col-xs-12 col-sm-12 col-md-12" style= "padding-top: 25px">
+
+                            <div class = "container-fluid col-xs-12 col-sm-6 col-md-6">
+                                <form class="form-horizontal">	
+
+                                	<div class="form-group">
+                                        <label class = "col-sm-2 col-md-2">Sent From</label>
+                                      	<div class = "col-sm-8 col-md-6">
+                                      		<input class="form-control " type="name" placeholder="Person" id = "sent_From_Person">
+                                        	<input class="form-control " type="name" placeholder="Company" id = "sent_From_Company">
+                                      	</div>
+	                                </div>
+	                                <div class="form-group">
+	                                        <label class = "col-sm-2 col-md-2">Description</label>
+                                            <div class="col-sm-8 col-md-6 ">
+                                                <textarea class="form-control" rows="5" id = "Description_value"></textarea>
+                                            </div>
+	                                </div>                                   
+                                    <div class="form-group" >
+                                        <label class = "col-sm-2 col-md-2" >Sent Date</label>
+                                        <div class="col-sm-4 col-md-4 " style = "font-size:12px" id="dateinline">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class = "container-fluid col-xs-12 col-sm-6 col-md-6">
+                                <form class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class = "col-sm-2 col-md-2">Artifacts</label>
+                                        <div class=" col-sm-8 col-md-8 ">
+                                        	<input type="file" name="input4" id="input4"  multiple >
+                                        	<!--<label class = "btn btn-default btn-file">
+                                        		click to select <input type="file" name="input4" id = "input4" multiple>
+                                        	</label> -->                                     	
+                                        	<br/>
+											<div class='bfd-dropfield' id="outfiledrop" style="padding-top:20px; font-size: 32px;">
+												<div class='bfd-dropfield-inner'  id = "filedrop" style="text-align: center; height: 350px; padding-top: 143px">or drop files here</div>
+											</div>
+											<div class='container-fluid bfd-files' id="filedata">
+											</div>
+                                            
+                                        </div>
+                                    </div>
+                                    
+                                </form>
+                            </div>
+
+                        </div>
+                        <p type ="button" class = "btn btn-primary btn-lg pull-right" id = "submit_newresponse" data-correspendence-id="0">Submit</p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+	</body>
+</html>

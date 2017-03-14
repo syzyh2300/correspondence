@@ -105,7 +105,7 @@ function insertfiles(err,data){
 
                         GUID = data.key;
                         name = GUID_filename[data.key];
-                        sprocString = "call insert_new_files('" +name+ "','" +GUID+ "'," +id+","+1+");";
+                        sprocString = "call insert_new_files('" +name+ "','" +GUID+ "'," +id+","+2+");";
                         console.log("sprocString: "+ sprocString);
                         executeSproc(sprocString, generalcheck);
                     }
