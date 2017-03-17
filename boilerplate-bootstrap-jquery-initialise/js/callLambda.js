@@ -89,7 +89,8 @@ function insertfiles(err,data){
             
             var pullResults = JSON.parse(data.Payload);
             var result = pullResults.respon[0][0];
-            var id = result["LAST_INSERT_ID()"];
+            var correspondenceid = result["LAST_INSERT_ID()"];
+            var responseid;
             for (var i = 0; i < artifacts.length; i++){
                 
                 name = artifacts[i].name;
@@ -105,7 +106,7 @@ function insertfiles(err,data){
 
                         GUID = data.key;
                         name = GUID_filename[data.key];
-                        sprocString = "call insert_new_files('" +name+ "','" +GUID+ "'," +id+","+2+");";
+                        sprocString = "call insert_new_files('" +name+ "','" +GUID+ "'," +correspondenceid+","+responseid+ ","+2+");";
                         console.log("sprocString: "+ sprocString);
                         executeSproc(sprocString, generalcheck);
                     }

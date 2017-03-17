@@ -35,6 +35,7 @@
         }
 
         $(document).ready(function(){
+
            var correspondenceID = getSearchParams("correspondenceID");
            if(correspondenceID){
                console.log("correspondenceID is: "+correspondenceID);
@@ -94,7 +95,7 @@
             lambda.invoke(pullParams, function(error, data) {
                     callback(error, data);
             }); // end lambda.invoke
-    }
+        }
 
 
 
@@ -106,67 +107,127 @@
                 var result = pullResults.respon[0];//get data from database
                 var resinfo;
                 var name;
-                for (var i = 0 ; i< result.length; i++){
-                    var singleobject = result[i];
-                    var beforeobject = -999;
-                    if(result[i-1]){beforeobject = result[i-1]["Response_ID"]}
+                
+                if (result.length ==0){
 
-                    var lastid = singleobject["Response_ID"];
+                    document.getElementById('resdiv0').style.display = 'none';
+                }
+                else{
 
-                    var description = singleobject["Description"];
-                    var date = singleobject["Sent_Date"]+ "(dd/mm/yy)";
-                    var sentfromperson = singleobject["Sent_From_Person"];
-                    var sentfromcompany = singleobject["Sent_From_Company"];
+                    document.getElementById('hideNoRes').style.display = 'none';
 
+                    for (var i = 0 ; i< result.length; i++){
 
-                        debugger;
+                        var singleobject = result[i];
+                        var beforeid = -999;
+                        if(result[i-1]){beforeid = result[i-1]["Response_ID"];}
+                        var lastid = singleobject["Response_ID"];
 
-                    if (i = 0){
-                        resinfo = '<div class = "container-fluid panel panel-default col-xs-12 col-sm-12 col-md-12" style= "padding-top: 25px"><div class = "container-fluid col-xs-6 col-sm-6 col-md-6"><form class="form-horizontal"><div class="form-group"><label class = "col-sm-2 col-md-2">Sent Date</label><div class="col-sm-4 col-md-4 "><p>'+date+'</p></div></div><div class="form-group"><label class = "col-sm-2 col-md-2">Sent From</label><div class="col-sm-4 col-md-4 "><p>'+sentfromperson+'.'+sentfromcompany+'</p></div></div><div class="form-group"><label class = "col-sm-2 col-md-2">Description</label><div class="col-sm-8 col-md-8 "><textarea class="form-control" rows="5" >'+description+'</textarea></div></div></form></div>';
+                        var description = singleobject["Description"];
+                        var date = singleobject["Sent_Date"]+ "(dd/mm/yy)";
+                        var sentfromperson = singleobject["Sent_From_Person"];
+                        var sentfromcompany = singleobject["Sent_From_Company"];
+                        name = singleobject["name"];
+                        var cloneCount = i+1;
 
-                        if(!singleobject["name"]){
-                            name = "No files uploaded.";
-                            resinfo += '<div class = "container-fluid col-xs-6 col-sm-6 col-md-6"><form class="form-horizontal"><div class="form-group"><label class = "col-sm-2 col-md-2">Artifacts</label><div class = "col-sm-3 col-md-5">' +name+ '</div><div class = "col-sm-1 col-md-1 pull-right form-horizontal"><a href="#"><span class="glyphicon glyphicon-trash "></span></a></div></div></form></div></div>';
+                        if(i==0){
+                            $("#resdiv0").clone()
+                                         .attr('id','resdiv'+cloneCount)
+                                         .insertAfter($('[id^=resdiv]:last'));
+                            $('[id^=discription]:last').attr('id','discription'+cloneCount).text(description);
+                            $('[id^=date]:last').attr('id','date'+cloneCount).text(date);
+                            $('[id^=nameAndcom]:last').attr('id','nameAndcom'+cloneCount).text(sentfromperson+", "+sentfromcompany);
+                            $('[id^=fname]:last').attr('id','fname'+cloneCount).text(name);
+                            $('[id^=delete]:last').attr('id','delete'+cloneCount).attr('data-resid',lastid);
+                        }
+                        else if(lastid == beforeid){
+                            $("#fname1").clone()
+                                        .attr('id','fname'+cloneCount)
+                                        .insertAfter($('[id^=fname]:last'))
+                                        .text(name);
                         }
                         else{
-                            name = singleobject["name"];
-                            resinfo += '<div class = "container-fluid col-xs-6 col-sm-6 col-md-6"><form class="form-horizontal"><div class="form-group"><label class = "col-sm-2 col-md-2">Artifacts</label><div class = "col-sm-3 col-md-5"><img src="img/fileimg.png">' +name+ '</div><div class = "col-sm-1 col-md-1 pull-right form-horizontal"><a href="#"><span class="glyphicon glyphicon-trash "></span></a></div></div></form></div></div>';
+                            $("#resdiv0").clone()
+                                         .attr('id','resdiv'+cloneCount)
+                                         .insertAfter($('[id^=resdiv]:last'));
+                            $('[id^=discription]:last').attr('id','discription'+cloneCount).text(description);
+                            $('[id^=date]:last').attr('id','date'+cloneCount).text(date);
+                            $('[id^=nameAndcom]:last').attr('id','nameAndcom'+cloneCount).text(sentfromperson+", "+sentfromcompany);
+                            $('[id^=fname]:last').attr('id','fname'+cloneCount).text(name);
+                            $('[id^=delete]:last').attr('id','delete'+cloneCount).attr('data-resid',lastid);
                         }
                     }
-                    else{
-                        resinfo += '<div class = "container-fluid panel panel-default col-xs-12 col-sm-12 col-md-12" style= "padding-top: 25px"><div class = "container-fluid col-xs-6 col-sm-6 col-md-6"><form class="form-horizontal"><div class="form-group"><label class = "col-sm-2 col-md-2">Sent Date</label><div class="col-sm-4 col-md-4 "><p>'+date+'</p></div></div><div class="form-group"><label class = "col-sm-2 col-md-2">Sent From</label><div class="col-sm-4 col-md-4 "><p>'+sentfromperson+'.'+sentfromcompany+'</p></div></div><div class="form-group"><label class = "col-sm-2 col-md-2">Description</label><div class="col-sm-8 col-md-8 "><textarea class="form-control" rows="5" >'+description+'</textarea></div></div></form></div>';
-                        if(!singleobject["name"]){
-                            name = "No files uploaded.";
-                            resinfo += '<div class = "container-fluid col-xs-6 col-sm-6 col-md-6"><form class="form-horizontal"><div class="form-group"><label class = "col-sm-2 col-md-2">Artifacts</label><div class = "col-sm-3 col-md-5">' +name+ '</div><div class = "col-sm-1 col-md-1 pull-right form-horizontal"><a href="#"><span class="glyphicon glyphicon-trash "></span></a></div></div></form></div></div>';
+                    document.getElementById('resdiv0').style.display = 'none';
+                }
+            }// end if
+        }
+
+        function confirmDelete(id){
+            
+            var result = confirm("Do you want to delete this response?");
+            if (result){
+                var correspondenceID = getSearchParams("correspondenceID");
+                var resID = $('#'+id).attr("data-resid");
+                var countnubmer = id[id.length -1];
+                
+
+                var data = { UserPoolId : 'us-west-2_boi1yXUkS',
+                                        ClientId : '28vv7qns6eobvm2rdvqino0dcu'
+                                    };
+                var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+                var cognitoUser = userPool.getCurrentUser();
+
+                if (cognitoUser != null) {
+                    cognitoUser.getSession(function(err, session) {
+                        if (err) {
+                            alert(err);
+                            return;
                         }
-                        else if()
-                    }
+                        console.log('session validity: ' + session.isValid());
+                        var AWS_Region = "us-west-2";
+                        var AWS_idToken = session.getIdToken().getJwtToken();
+                        var AWS_Logins = {'cognito-idp.us-west-2.amazonaws.com/us-west-2_boi1yXUkS' : AWS_idToken}
+                        var AWS_IdentityPoolId = "us-west-2:df08250b-a24c-4a6c-826c-e3bb2ae75d63";
+                        var AWS_UserPoolId = "us-west-2_boi1yXUkS";
+                        AWS.config.region      = AWS_Region;
+                        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                                                IdentityPoolId : AWS_IdentityPoolId, 
+                                                        Logins : AWS_Logins
+                                                });
+                        AWS.config.credentials.get(function(){
+                            var sprocString = "call Response_Delete(" +resID+ ");";
 
-
-
-
-
-                    
+                            executeSproc(sprocString, generalcheck);
+                            document.getElementById('resdiv'+ countnubmer).style.display = 'none';
+                        }); // end credentials.get
+                    });
                 }
-                debugger;   
-
-
-                var fileslength = pullResults.respon[1].length;
-                var files = pullResults.respon[1];
-                document.getElementById('filedrop').innerHTML="";
-                for (var i =0; i<fileslength;i++){
-                    var fileinfo = '<p data-exist="already-in-database"><img src="img/fileimg.png" alt="">'+ files[i]["name"];
-                    document.getElementById('filedrop').innerHTML += fileinfo;
+                else{
+                    alert("Please login in");
+                    return;
                 }
-                document.getElementById('filedrop').innerHTML += '<p style="font-size :12px">Total of ' + files.length + " files";
-                document.getElementById("outfiledrop").style.fontSize = "8px";
-                document.getElementById("filedrop").style.textAlign="";
-                document.getElementById("filedrop").style.paddingTop="";
+               
 
-            } // end if
+
+                return true
+
+            }
+        }
+
+        function generalcheck(err,data){
+            if (err) { console.log(error);
+                        } 
+            else {
+                var pullResults = JSON.parse(data.Payload);
+                var sproc_Response  = pullResults.respon[0][0].RESPONSE;
+                var sproc_EventId   = pullResults.respon[0][0].Event_ID;
+                console.log(sproc_Response);
+                console.log(sproc_EventId);
+            }
         }
 
         </script>
+
         <style>
         </style>
     </head>
@@ -197,7 +258,7 @@
                 <div class = "col-sm-12  col-md-12  main">
                     <h1 class = "page-header ">Correspondence</h1> 
                     <div class ="col-xs-12 col-sm-12 ">
-                        <a href="Co_respond.html" class="btn btn-default btn-primary pull-right btn-lg " id = newresponseid1>New Response</a>  
+                        <a href="Co_respond.html" class="btn btn-default btn-primary pull-right btn-lg " id = "newresponseid1">New Response</a>  
                     </div>
 
                     <div class = "col-sm-12 col-md-12">
@@ -263,28 +324,28 @@
                     </div>
                     <div class = "col-sm-12 col-md-12">
                         <h4 class = "sub-header">Responses</h4>
-                        <div class = "container-fluid panel panel-default col-xs-12 col-sm-12 col-md-12" style= "padding-top: 25px" >
+                        <div class = "container-fluid panel panel-default col-xs-12 col-sm-12 col-md-12" id = "hideNoRes" style= "padding-top: 25px"  >
                             No Responses Yet
                         </div>
-<!--                         <div class = "container-fluid panel panel-default col-xs-12 col-sm-12 col-md-12" style= "padding-top: 25px">
+                        <div class = "container-fluid panel panel-default col-xs-12 col-sm-12 col-md-12" style= "padding-top: 25px" id = "resdiv0" >
                             <div class = "container-fluid col-xs-6 col-sm-6 col-md-6">
                                 <form class="form-horizontal">
                                    <div class="form-group">
                                         <label class = "col-sm-2 col-md-2">Sent Date</label>
                                             <div class="col-sm-4 col-md-4 ">
-                                                <p>21 March 2017</p>
+                                                <p id = "date1"></p>
                                             </div>
                                   </div>
                                   <div class="form-group">
                                         <label class = "col-sm-2 col-md-2">Sent From</label>
                                             <div class="col-sm-4 col-md-4 ">
-                                                <p>Jennifer Rodgers. Telstra Procurement</p>
+                                                <p id = "nameAndcom1"></p>
                                             </div>
                                   </div>
                                         <div class="form-group">
                                             <label class = "col-sm-2 col-md-2">Description</label>
                                             <div class="col-sm-8 col-md-8 ">
-                                                <textarea class="form-control" rows="5" ></textarea>
+                                                <p id = "discription1"></p>
                                             </div>
                                         </div>
                                 </form>
@@ -295,10 +356,10 @@
                                     <div class="form-group">
                                         <label class = "col-sm-2 col-md-2">Artifacts</label>
                                         <div class = "col-sm-3 col-md-5">
-                                            <span style="font-size: 30px" class="glyphicon glyphicon-file"></span>
+                                            <span style="font-size: 30px" class="glyphicon glyphicon-file" id = "fname1"></span>
                                         </div>
                                         <div class = "col-sm-1 col-md-1 pull-right form-horizontal">
-                                            <a href="#">
+                                            <a href="javascript:void(0)" id = "delete1" onclick ="return confirmDelete(this.id)" data-resid = "" >
                                                <span class="glyphicon glyphicon-trash "></span>  
                                             </a>
                                         </div>
@@ -307,41 +368,7 @@
                             </div>
 
                         </div>
-                        <div class = "container-fluid panel panel-default col-xs-12 col-sm-12 col-md-12" style= "padding-top: 25px">
-                            <div class = "container-fluid col-xs-6 col-sm-6 col-md-6">
-                                <form class="form-horizontal">
-                                   <div class="form-group">
-                                        <label class = "col-sm-2 col-md-2">Sent Date</label>
-                                            <div class="col-sm-4 col-md-4 ">
-                                                <p>21 March 2017</p>
-                                            </div>
-                                  </div>
-                                  <div class="form-group">
-                                        <label class = "col-sm-2 col-md-2">Sent From</label>
-                                            <div class="col-sm-4 col-md-4 ">
-                                                <p>Jennifer Rodgers. Telstra Procurement</p>
-                                            </div>
-                                  </div>
-                                </form>
-                            </div>
-
-                            <div class = "container-fluid col-xs-6 col-sm-6 col-md-6">
-                                <form class="form-horizontal">
-                                    <div class="form-group">
-                                        <label class = "col-sm-2 col-md-2">Artifacts</label>
-                                        <div class = "col-sm-3 col-md-5">
-                                            <span style="font-size: 30px" class="glyphicon glyphicon-file"></span>
-                                        </div>
-                                        <div class = "col-sm-1 col-md-1 pull-right form-horizontal">
-                                            <a href="#">
-                                               <span class="glyphicon glyphicon-trash "></span>  
-                                            </a>
-                                        </div>
-                                    </div>
-                                </form> 
-                            </div>
-                            
-                        </div> -->
+                        
                     </div>
                                       
                 </div>
