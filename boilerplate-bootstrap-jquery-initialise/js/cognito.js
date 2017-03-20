@@ -40,6 +40,9 @@ $(document).on("click", "#submit1", function(){
                                             Logins : AWS_Logins
                             		});
             alert("Login success");
+            AWS.config.credentials.get(function(){
+                retrivingdata();
+            });
 
             // var s3 = new AWS.S3({
             //     region: 'ap-southeast-2',
@@ -48,7 +51,9 @@ $(document).on("click", "#submit1", function(){
             //             },
 
             // });
-            
+
+            // console.log(AWS.config.credentials.identityId);
+            //get cognito ID
 
 
 
@@ -80,7 +85,7 @@ $(document).on("click", "#submit1", function(){
 
 
             // AWS.config.credentials.get(function(){
-            // 	// var tstring = "call insert_new_correspondence(1,'Email','this is description','2017-3-1', 'this is file path', 'Jone','ISGM', 'Jason','Telstra',1);";
+            	 
             // 	var tstring = "select 123;";
             //     var AWS_Region = "us-west-2";
             // 	var lambda = new AWS.Lambda({region: AWS_Region, apiVersion: '2015-03-31'}); 
@@ -193,3 +198,7 @@ $(document).on("click", "#register-submit", function(){
     }
 })
 
+function retrivingdata(){
+    var sprocString = "call select_data(" +id+ "," +3+ ");";
+    executeSproc(sprocString, populateForm_callback);
+}

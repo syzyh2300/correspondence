@@ -90,9 +90,13 @@ function insertfiles(err,data){
             var pullResults = JSON.parse(data.Payload);
             var result = pullResults.respon[0][0];
             var correspondenceid = result["LAST_INSERT_ID()"];
-            var responseid;
+            if (correspondenceid == 0){
+                correspondenceid = $('#submit_newcoorespondence').attr("data-correspendence-id");
+                checkstatus = 3;
+            }
+            var responseid = 0;
+            
             for (var i = 0; i < artifacts.length; i++){
-                
                 name = artifacts[i].name;
                 GUID = saveFilesName();
                 params = {Key : GUID, Body : artifacts[i], ACL: 'public-read'};
@@ -106,7 +110,8 @@ function insertfiles(err,data){
 
                         GUID = data.key;
                         name = GUID_filename[data.key];
-                        sprocString = "call insert_new_files('" +name+ "','" +GUID+ "'," +correspondenceid+","+responseid+ ","+2+");";
+                        sprocString = "call insert_new_files('" +name+ "','" +GUID+ "'," +correspondenceid+","+responseid+ ","+checkstatus+");";
+                        checkstatus++;
                         console.log("sprocString: "+ sprocString);
                         executeSproc(sprocString, generalcheck);
                     }
@@ -134,7 +139,7 @@ function executeSproc(sprocString, callback){
 }
 
 function generalcheck(err,data){
-    if (err) { console.log(error);
+    if (err) { console.log(err);
                 } 
     else {
         var pullResults = JSON.parse(data.Payload);
