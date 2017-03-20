@@ -107,7 +107,7 @@
                 var result = pullResults.respon[0];//get data from database
                 var resinfo;
                 var name;
-                
+                retrivingCorres(pullResults);
                 if (result.length ==0){
 
                     document.getElementById('resdiv0').style.display = 'none';
@@ -130,17 +130,7 @@
                         name = singleobject["name"];
                         var cloneCount = i+1;
 
-                        if(i==0){
-                            $("#resdiv0").clone()
-                                         .attr('id','resdiv'+cloneCount)
-                                         .insertAfter($('[id^=resdiv]:last'));
-                            $('[id^=discription]:last').attr('id','discription'+cloneCount).text(description);
-                            $('[id^=date]:last').attr('id','date'+cloneCount).text(date);
-                            $('[id^=nameAndcom]:last').attr('id','nameAndcom'+cloneCount).text(sentfromperson+", "+sentfromcompany);
-                            $('[id^=fname]:last').attr('id','fname'+cloneCount).text(name);
-                            $('[id^=delete]:last').attr('id','delete'+cloneCount).attr('data-resid',lastid);
-                        }
-                        else if(lastid == beforeid){
+                        if(lastid == beforeid){
                             $("#fname1").clone()
                                         .attr('id','fname'+cloneCount)
                                         .insertAfter($('[id^=fname]:last'))
@@ -226,9 +216,57 @@
             }
         }
 
+        function retrivingCorres(pullResults){
+            debugger;
+            var result = pullResults.respon[1][0];//get data from database
+            var status = result["Status"];
+            if (status == 1){status = "Open"}
+            if (status == 0){status = "Completed"}
+            var type = result["Type"];
+            var description = result["Description"];
+            var date = result["Sent_Date"];
+            var sentfromperson = result["Sent_From_Person"];
+            var sentfromcompany = result["Sent_From_Company"];
+            var senttoperson = result["Sent_To_Person"];
+            var senttocompany = result["Sent_To_Company"];
+            $("#Status_value").text(status);
+            $("#Type_value").text(type);
+            $("#Date_value").text(date+" (dd-mm-yy)");
+            $("#Description_value").val(description).change();
+            $("#sent_From_PersonAndCom").text(sentfromperson+","+sentfromcompany);
+            $("#sent_To_PersonAndCom").text(senttoperson+","+senttocompany);
+
+            var fileslength = pullResults.respon[2].length;
+            var files = pullResults.respon[2];
+            document.getElementById('filedrop').innerHTML="";
+            for (var i =0; i<fileslength;i++){
+                var fileinfo = '<p data-exist="already-in-database"><img src="img/fileimg.png" alt="">'+ files[i]["name"];
+                document.getElementById('filedrop').innerHTML += fileinfo;
+            }
+            document.getElementById('filedrop').innerHTML += '<p style="font-size :12px">Total of ' + files.length + " files";
+            document.getElementById("outfiledrop").style.fontSize = "8px";
+            document.getElementById("filedrop").style.textAlign="";
+            document.getElementById("filedrop").style.paddingTop="";
+        }
+
         </script>
 
         <style>
+        .bfd-dropfield-inner {
+         border: 5px dashed #888;
+         color: #888;
+         cursor: pointer;
+
+        overflow-y: auto;
+        height: 250px; 
+        }
+        .bfd-dropfield-inner:hover, .bfd-dropfield-inner.bfd-dragover {
+            border-color: #bbb;
+            color: #bbb; }
+        .bfd-dropfield {
+          display: inline;
+          padding: 5px; }
+
         </style>
     </head>
 
@@ -269,37 +307,37 @@
                                    <div class="form-group">
                                         <label class = "col-sm-2 col-md-2">Status</label>
                                             <div class="col-sm-4 col-md-4 ">
-                                                <p>Open</p>
+                                                <p id = "Status_value">Open</p>
                                             </div>
                                   </div>
                                   <div class="form-group">
                                         <label class = "col-sm-2 col-md-2">Type</label>
                                             <div class="col-sm-4 col-md-4 ">
-                                                <p>Email</p>
+                                                <p id = "Type_value">Email</p>
                                             </div>
                                   </div>
                                   <div class="form-group">
                                         <label class = "col-sm-2 col-md-2">Description</label>
                                             <div class="col-sm-4 col-md-4 ">
-                                                <output>12314v sadf asdfv asfdv fsdd</output>
+                                                <output id = "Description_value">12314v sadf asdfv asfdv fsdd</output>
                                             </div>
                                   </div>
                                   <div class="form-group">
                                         <label class = "col-sm-2 col-md-2">Sent Date</label>
                                             <div class="col-sm-4 col-md-4 ">
-                                                <p>21 March 2017</p>
+                                                <p id = "Date_value">21 March 2017</p>
                                             </div>
                                   </div>
                                   <div class="form-group">
                                         <label class = "col-sm-2 col-md-2">Sent From</label>
                                             <div class="col-sm-4 col-md-4">
-                                                <p>Jennifer Rodgers. Telstra Procurement</p>
+                                                <p id = "sent_From_PersonAndCom">Jennifer Rodgers. Telstra Procurement</p>
                                             </div>
                                   </div>
                                   <div class="form-group">
                                         <label class = "col-sm-2 col-md-2">Sent To</label>
                                             <div class="col-sm-4 col-md-4">
-                                                <p>Rodger David. ISGM</p>
+                                                <p id = "sent_To_PersonAndCom">Rodger David. ISGM</p>
                                             </div>
                                   </div>
 
@@ -310,8 +348,12 @@
                                 <form class="form-horizontal">
                                     <div class="form-group">
                                         <label class = "col-sm-2 col-md-2">Artifacts</label>
-                                        <div class="files-showup col-sm-4 col-md-6 ">
-                                            <span style="font-size: 75px" class="glyphicon glyphicon-file"></span>
+                                        <div class=" col-sm-8 col-md-8 ">
+
+                                            <div class='bfd-dropfield' id="outfiledrop" style="padding-top:20px; font-size: 32px;">
+                                                <div class='bfd-dropfield-inner'  id = "filedrop" style="text-align: center; height: 350px; padding-top: 143px"></div>
+                                            </div>
+                                            
                                         </div>
                                     </div>
                                     <div class = "form-group ">

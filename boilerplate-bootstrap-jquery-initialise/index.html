@@ -88,7 +88,10 @@
                         <a href="Co_register.html" class="btn btn-default btn-primary pull-right btn-lg ">New Correspondence</a>  
                     </div>
                     <h5 class = "sub-header">Click an item to update and/or view details...</h5>
-                    <div class = "table-responsive">
+                    <div class = "container-fluid panel panel-default col-xs-12 col-sm-12 col-md-12" id = "hideNoCorres" style= "padding-top: 25px"  >
+                            No Correspondence Yet, please insert new one
+                    </div>
+                    <div class = "table-responsive" id ="CorresTable">
                         <table class ="table table-hover table-striped table-bordered">
                             <thead class = "thead-inverse">
                                 <tr class="bg-info">
@@ -105,64 +108,22 @@
                                     <th>Agreed Departures</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                            </tbody>
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                            </tbody>
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                            </tbody>
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                            <tbody id = "tbody0">
+                                <tr onclick="document.location = '';" id = "href1">
+                                    
+                                    <td id = "reference1"></td>
+                                    <td id = "status1"></td>
+                                    <td id = "description1"></td>
+                                    <td id = "type1"></td>
+                                    <td id = "date1"></td>
+                                    <td id = "sentfromperson1"></td>
+                                    <td>
+                                        <span style="font-size: 30px" class="glyphicon glyphicon-file" id = "fname1"></span>
+                                    </td>
+                                    <td id = "senttoperson1"></td>
+                                    <td id = "senttocompany1"></td>
+                                    <td id = "respon1"></td>
+                                    <td id = "agreeddep1"></td>
                                 </tr>
                             </tbody>
                     </table>

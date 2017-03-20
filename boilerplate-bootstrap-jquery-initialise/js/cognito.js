@@ -199,6 +199,93 @@ $(document).on("click", "#register-submit", function(){
 })
 
 function retrivingdata(){
+    var id = 1;//in other case this id should be user id in the user table
+
     var sprocString = "call select_data(" +id+ "," +3+ ");";
     executeSproc(sprocString, populateForm_callback);
+}
+
+function executeSproc(sprocString, callback){
+    var tsting = sprocString;
+    var AWS_Region = "us-west-2";
+    var lambda = new AWS.Lambda({region: AWS_Region, apiVersion: '2015-03-31'}); 
+    var payload_JSON = {"sproc": tsting }; // create JSON object for parameters for invoking Lambda function
+    var payload_String = JSON.stringify(payload_JSON)
+    var pullParams = { FunctionName : 'test123', Payload : payload_String }; // http://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html ref this for synchronous / asynchronous
+    var pullResults; // create variable to hold data returned by the Lambda function
+
+    lambda.invoke(pullParams, function(error, data) {
+            callback(error, data);
+    }); // end lambda.invoke
+}
+
+ function populateForm_callback(error, data){
+
+    if (error) { console.log(error);
+                } 
+    else {
+        var pullResults = JSON.parse(data.Payload);
+        var result = pullResults.respon[0];//get data from database
+        var resinfo;
+        var name;
+
+        if (result.length ==0){
+
+            document.getElementById('CorresTable').style.display = 'none';
+        }
+        else{
+
+            document.getElementById('hideNoCorres').style.display = 'none';
+
+            for (var i = 0 ; i< result.length; i++){
+
+                var singleobject = result[i];
+                var beforeid = -999;
+                if(result[i-1]){beforeid = result[i-1]["Correspondence_ID"];}
+                var lastid = singleobject["Correspondence_ID"];
+
+                var description = singleobject["Description"];
+                var date = singleobject["Sent_Date"]+ "(dd/mm/yy)";
+                var respon = singleobject["Respon"];
+                var sentfromperson = singleobject["Sent_From_Person"];
+                var senttoperson = singleobject["Sent_To_Person"];
+                var senttocompany = singleobject["Sent_To_Company"];
+                var agreeddep = singleobject["AgreedDep"];
+                var reference = singleobject["Reference"];
+                var type = singleobject["Type"];
+                var location = "document.location = 'Co_Details.html?correspondenceID=" + lastid + "'";
+                var status = singleobject["Status"];
+                if(status == 1){status = "Open"} else{status = "Completed"};
+
+                name = singleobject["name"];
+                var cloneCount = i+1;
+
+                if(lastid == beforeid){
+                    $("#fname1").clone()
+                                .attr('id','fname'+cloneCount)
+                                .insertAfter($('[id^=fname]:last'))
+                                .text(name);
+                }
+                else{
+                    $("#tbody0").clone()
+                                 .attr('id','tbody'+cloneCount)
+                                 .insertAfter($('[id^=tbody]:last'));
+                    $('[id^=description]:last').attr('id','description'+cloneCount).text(description);
+                    $('[id^=date]:last').attr('id','date'+cloneCount).text(date);
+                    $('[id^=respon]:last').attr('id','respon'+cloneCount).text(respon);
+                    $('[id^=agreeddep]:last').attr('id','agreeddep'+cloneCount).text(agreeddep);
+                    $('[id^=reference]:last').attr('id','reference'+cloneCount).text(reference);
+                    $('[id^=status]:last').attr('id','status'+cloneCount).text(status);
+                    $('[id^=type]:last').attr('id','type'+cloneCount).text(type);
+                    $('[id^=sentfromperson]:last').attr('id','sentfromperson'+cloneCount).text(sentfromperson);
+                    $('[id^=senttoperson]:last').attr('id','senttoperson'+cloneCount).text(senttoperson);
+                    $('[id^=senttocompany]:last').attr('id','senttocompany'+cloneCount).text(senttocompany);
+                    $('[id^=fname]:last').attr('id','fname'+cloneCount).text(name);
+                    $('[id^=href]:last').attr('id','href'+cloneCount).attr('onclick',location);
+                }
+
+            }
+            document.getElementById('tbody0').style.display = 'none';
+        }
+    }// end if
 }
