@@ -7,7 +7,7 @@
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/bootstrap-theme.min.css" rel="stylesheet">
         <link href="css/navbar-fixed-top.css" rel="stylesheet">
-        <link href="css/customcss.css" rel="stylesheet">
+
 
         <link href="favicon.ico" rel="icon">
         <script src="js/jquery-3.1.1.min.js"></script>
@@ -83,6 +83,80 @@
             executeSproc(sprocString, populateForm_callback);
         }
 
+        function retrivingfiles(coorespondenceID,filename){
+            var name = filename;
+            var id = coorespondenceID;
+            var sprocString = "call filedownload(" +id+ ',"' +filename+ '");';
+
+            executeSproc(sprocString, function(err, data){
+                if(err){ console.log(err);}
+                else {
+                    var pullResults = JSON.parse(data.Payload);
+                    var result = pullResults.respon[0][0];
+                    var s3 = new AWS.S3({
+                        region: 'ap-southeast-2',
+                        apiVersion: '2006-03-01',
+                        params: {Bucket: 'correspendence'
+                                },
+
+                    });
+                    var url2;
+
+                    s3.getSignedUrl('getObject', {Bucket:'correspendence' , Key: result['GUID']}, function(err, url){
+                        url2 = url;
+                    });
+                    saveFileFromURL(url2,name);
+                }
+            });
+        }
+
+        function retrivingResfiles(coorespondenceID,filename,resid){
+
+            var name = filename;
+            var id = coorespondenceID;
+            var Resid = resid;
+            var sprocString = "call ResFiledownload(" +id+ ',"' +filename+ '",'+Resid+');';
+            executeSproc(sprocString, function(err, data){
+                if(err){ console.log(err);}
+                else {
+                    var pullResults = JSON.parse(data.Payload);
+                    var result = pullResults.respon[0][0];
+                    var s3 = new AWS.S3({
+                        region: 'ap-southeast-2',
+                        apiVersion: '2006-03-01',
+                        params: {Bucket: 'correspendence'
+                                },
+
+                    });
+                    var url2;
+
+                    s3.getSignedUrl('getObject', {Bucket:'correspendence' , Key: result['GUID']}, function(err, url){
+                        url2 = url;
+                    });
+                    saveFileFromURL(url2,name);
+                }
+            });
+        }
+
+        function saveFileFromURL(url,name) {
+    // Get file name from url.
+          var filename = name
+          var xhr = new XMLHttpRequest();
+          xhr.responseType = 'blob';
+          xhr.onload = function() {
+            var a = document.createElement('a');
+            a.href = window.URL.createObjectURL(xhr.response); // xhr.response is a blob
+            a.download = filename; // Set the file name.
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            delete a;
+          };
+          xhr.open('GET', url);
+          xhr.send();
+        }
+
+
         function executeSproc(sprocString, callback){
             var tsting = sprocString;
             var AWS_Region = "us-west-2";
@@ -128,23 +202,51 @@
                         var sentfromperson = singleobject["Sent_From_Person"];
                         var sentfromcompany = singleobject["Sent_From_Company"];
                         name = singleobject["name"];
-                        var cloneCount = i+1;
+                        if(!name){name = "No file"}
+                        var cloneCount = i+2;
 
                         if(lastid == beforeid){
+                            if( name == "No file"){
                             $("#fname1").clone()
                                         .attr('id','fname'+cloneCount)
                                         .insertAfter($('[id^=fname]:last'))
-                                        .text(name);
+                                        .text(name)
+                                        .attr('value', name)
+                                        .attr('data-resid',lastid);
+                            }
+                            else {
+                            $("#fname1").clone()
+                                        .attr('id','fname'+cloneCount)
+                                        .insertAfter($('[id^=fname]:last'))
+                                        .text(name)
+                                        .attr('value', name)
+                                        .attr('onclick',"dlfiles(this.id)")
+                                        .attr('data-resid',lastid);
+                            }
+
                         }
                         else{
+                            if (name == "No file"){
                             $("#resdiv0").clone()
                                          .attr('id','resdiv'+cloneCount)
                                          .insertAfter($('[id^=resdiv]:last'));
                             $('[id^=discription]:last').attr('id','discription'+cloneCount).text(description);
                             $('[id^=date]:last').attr('id','date'+cloneCount).text(date);
                             $('[id^=nameAndcom]:last').attr('id','nameAndcom'+cloneCount).text(sentfromperson+", "+sentfromcompany);
-                            $('[id^=fname]:last').attr('id','fname'+cloneCount).text(name);
-                            $('[id^=delete]:last').attr('id','delete'+cloneCount).attr('data-resid',lastid);
+                            $('[id^=fname]:last').attr('id','fname'+cloneCount).text(name).attr('value', name).attr('data-resid',lastid);
+                            $('[id^=delete]:last').attr('id','delete'+cloneCount).attr('data-resid',lastid);                                
+                            }
+                            else{
+                            $("#resdiv0").clone()
+                                         .attr('id','resdiv'+cloneCount)
+                                         .insertAfter($('[id^=resdiv]:last'));
+                            $('[id^=discription]:last').attr('id','discription'+cloneCount).text(description);
+                            $('[id^=date]:last').attr('id','date'+cloneCount).text(date);
+                            $('[id^=nameAndcom]:last').attr('id','nameAndcom'+cloneCount).text(sentfromperson+", "+sentfromcompany);
+                            $('[id^=fname]:last').attr('id','fname'+cloneCount).text(name).attr('value', name).attr('onclick',"dlfiles(this.id)").attr('data-resid',lastid);
+                            $('[id^=delete]:last').attr('id','delete'+cloneCount).attr('data-resid',lastid);                               
+                            }
+
                         }
                     }
                     document.getElementById('resdiv0').style.display = 'none';
@@ -217,7 +319,7 @@
         }
 
         function retrivingCorres(pullResults){
-            debugger;
+
             var result = pullResults.respon[1][0];//get data from database
             var status = result["Status"];
             if (status == 1){status = "Open"}
@@ -240,13 +342,56 @@
             var files = pullResults.respon[2];
             document.getElementById('filedrop').innerHTML="";
             for (var i =0; i<fileslength;i++){
-                var fileinfo = '<p data-exist="already-in-database"><img src="img/fileimg.png" alt="">'+ files[i]["name"];
+                var fileinfo = '<a data-exist="already-in-database" id = "fc'+i+ '" onclick = "dlfiles(this.id)" value = "'+files[i]["name"]+'"><img src="img/fileimg.png" alt="">'+ files[i]["name"];
                 document.getElementById('filedrop').innerHTML += fileinfo;
             }
             document.getElementById('filedrop').innerHTML += '<p style="font-size :12px">Total of ' + files.length + " files";
             document.getElementById("outfiledrop").style.fontSize = "8px";
             document.getElementById("filedrop").style.textAlign="";
             document.getElementById("filedrop").style.paddingTop="";
+        }
+
+        function dlfiles(id){
+            console.log("files name : "+ id+','+ $('#'+id).attr("value"));
+            var filename = $('#'+id).attr("value");
+            var resid = $('#'+id).attr("data-resid");
+            var correspondenceID = getSearchParams("correspondenceID");
+            if(correspondenceID){
+                var data = { UserPoolId : 'us-west-2_boi1yXUkS',
+                    ClientId : '28vv7qns6eobvm2rdvqino0dcu'
+                };
+                var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+                var cognitoUser = userPool.getCurrentUser();
+                if (cognitoUser != null) {
+                    cognitoUser.getSession(function(err, session) {
+                        if (err) {
+                            alert(err);
+                            return;
+                        }
+                        console.log('session validity: ' + session.isValid());
+                        var AWS_Region = "us-west-2";
+                        var AWS_idToken = session.getIdToken().getJwtToken();
+                        var AWS_Logins = {'cognito-idp.us-west-2.amazonaws.com/us-west-2_boi1yXUkS' : AWS_idToken}
+                        var AWS_IdentityPoolId = "us-west-2:df08250b-a24c-4a6c-826c-e3bb2ae75d63";
+                        var AWS_UserPoolId = "us-west-2_boi1yXUkS";
+                        AWS.config.region      = AWS_Region;
+                        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                                                IdentityPoolId : AWS_IdentityPoolId, 
+                                                        Logins : AWS_Logins
+                                                });
+                        AWS.config.credentials.get(function(){
+
+                            if(!resid){retrivingfiles(correspondenceID,filename);}
+                            else{retrivingResfiles(correspondenceID,filename,resid)}
+                            
+                        }); // end credentials.get
+                    });
+                }
+                else{
+                    alert("Please login in");
+                    return;
+                }
+            }
         }
 
         </script>
@@ -260,9 +405,7 @@
         overflow-y: auto;
         height: 250px; 
         }
-        .bfd-dropfield-inner:hover, .bfd-dropfield-inner.bfd-dragover {
-            border-color: #bbb;
-            color: #bbb; }
+
         .bfd-dropfield {
           display: inline;
           padding: 5px; }
@@ -398,7 +541,7 @@
                                     <div class="form-group">
                                         <label class = "col-sm-2 col-md-2">Artifacts</label>
                                         <div class = "col-sm-3 col-md-5">
-                                            <span style="font-size: 30px" class="glyphicon glyphicon-file" id = "fname1"></span>
+                                            <a style="font-size: 30px" class="glyphicon glyphicon-file" id = "fname1"></a>
                                         </div>
                                         <div class = "col-sm-1 col-md-1 pull-right form-horizontal">
                                             <a href="javascript:void(0)" id = "delete1" onclick ="return confirmDelete(this.id)" data-resid = "" >

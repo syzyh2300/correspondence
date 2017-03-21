@@ -1,50 +1,4 @@
-$(document).on("click", "#submit1", function(){
-    //var username1 = $("#username1").val();
-    
-
-	var password1 = $("#password1").val();
-	var userEmail = $("#email1").val();
-	var AWS_userpoolID = "us-west-2_boi1yXUkS";
-	var AWS_clientID = "28vv7qns6eobvm2rdvqino0dcu";
-
-	var authenticationData = {Username : userEmail, Password : password1};
-	var UserPoolData = { UserPoolId : AWS_userpoolID, ClientId : AWS_clientID };
-	var userPool  = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(UserPoolData); 
-
-	var userData = {Username : userEmail, Pool : userPool};
-	var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
-	var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
-	//for user pool login
-	
-	cognitoUser.authenticateUser(authenticationDetails, {
-
-		onSuccess:  function(result){
-			
-			// console.log("accessToken: "+JSON.stringify(result.accessToken));
-            // console.log("idToken: "+JSON.stringify(result.idToken));
-            // console.log("refreshToken: "+JSON.stringify(result.refreshToken));
-            //for testing with console.log
-
-            var AWS_idToken = result.getIdToken().getJwtToken();
-            //get user pool id
-
-            var AWS_Region = "us-west-2";
-            var AWS_IdentityPoolId = "us-west-2:df08250b-a24c-4a6c-826c-e3bb2ae75d63";
-            var AWS_UserPoolId = "us-west-2_boi1yXUkS";
-            
-            var AWS_Logins = {'cognito-idp.us-west-2.amazonaws.com/us-west-2_boi1yXUkS' : AWS_idToken}
-
-            AWS.config.region = AWS_Region;
-            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-                                    IdentityPoolId : AWS_IdentityPoolId, 
-                                            Logins : AWS_Logins
-                            		});
-            alert("Login success");
-            AWS.config.credentials.get(function(){
-                retrivingdata();
-            });
-
-            // var s3 = new AWS.S3({
+// var s3 = new AWS.S3({
             //     region: 'ap-southeast-2',
             //     apiVersion: '2006-03-01',
             //     params: {Bucket: 'correspendence'
@@ -85,18 +39,18 @@ $(document).on("click", "#submit1", function(){
 
 
             // AWS.config.credentials.get(function(){
-            	 
-            // 	var tstring = "select 123;";
+                 
+            //  var tstring = "select 123;";
             //     var AWS_Region = "us-west-2";
-            // 	var lambda = new AWS.Lambda({region: AWS_Region, apiVersion: '2015-03-31'}); 
+            //  var lambda = new AWS.Lambda({region: AWS_Region, apiVersion: '2015-03-31'}); 
 
-            // 	var p_JSON = {"sproc": tstring };
-            // 	var p_String = JSON.stringify(p_JSON);
-            // 	var pullp = { FunctionName : 'test123', Payload : p_String };
-            // 	var pResult;
-            // 	//for returning the Lambda function
+            //  var p_JSON = {"sproc": tstring };
+            //  var p_String = JSON.stringify(p_JSON);
+            //  var pullp = { FunctionName : 'test123', Payload : p_String };
+            //  var pResult;
+            //  //for returning the Lambda function
 
-            // 	lambda.invoke(pullp, function(error, data) {
+            //  lambda.invoke(pullp, function(error, data) {
                         
             //             if (error) { console.log(error);
             //             } else {
@@ -105,18 +59,6 @@ $(document).on("click", "#submit1", function(){
             //             } // end if
             //     }); // end lambda.invoke
             // })
-		},
-		newPasswordRequired: function(userAttributes, requiredAttributes){
-                        var newPassword = prompt('Enter new password ' ,'');
-                        cognitoUser.completeNewPasswordChallenge(newPassword, [], this);
-                    },
-
-		onFailure: function(err) {
-			
-                        alert(err);
-        }
-	})
-})
 
 // *************************************************upload files(*works*)
 // function uploadFile(albumName) {
@@ -197,6 +139,43 @@ $(document).on("click", "#register-submit", function(){
         });    
     }
 })
+$(document).ready(function(){
+    var data = { UserPoolId : 'us-west-2_boi1yXUkS',
+                    ClientId : '28vv7qns6eobvm2rdvqino0dcu'
+                };
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+    var cognitoUser = userPool.getCurrentUser();
+
+    if (cognitoUser != null) {
+        cognitoUser.getSession(function(err, session) {
+            if (err) {
+                alert(err);
+                return;
+            }
+            console.log('session validity: ' + session.isValid());
+            var AWS_Region = "us-west-2";
+            var AWS_idToken = session.getIdToken().getJwtToken();
+            var AWS_Logins = {'cognito-idp.us-west-2.amazonaws.com/us-west-2_boi1yXUkS' : AWS_idToken}
+            var AWS_IdentityPoolId = "us-west-2:df08250b-a24c-4a6c-826c-e3bb2ae75d63";
+            var AWS_UserPoolId = "us-west-2_boi1yXUkS";
+            AWS.config.region      = AWS_Region;
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                                    IdentityPoolId : AWS_IdentityPoolId, 
+                                            Logins : AWS_Logins
+                                    });
+            AWS.config.credentials.get(function(){
+                retrivingdata();
+                
+            }); // end credentials.get
+        });
+    }
+    else{
+        alert("Please login in");
+        window.location.href = 'index.html';
+        return;
+    }
+})
+
 
 function retrivingdata(){
     var id = 1;//in other case this id should be user id in the user table
@@ -258,6 +237,7 @@ function executeSproc(sprocString, callback){
                 if(status == 1){status = "Open"} else{status = "Completed"};
 
                 name = singleobject["name"];
+                if(!name){name = "No file"}
                 var cloneCount = i+1;
 
                 if(lastid == beforeid){
