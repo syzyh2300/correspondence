@@ -72,6 +72,7 @@
                 }
                 else{
                     alert("Please login in");
+                    window.location.href = 'index.html';
                     return;
                 }
            }
@@ -296,6 +297,7 @@
                 }
                 else{
                     alert("Please login in");
+                    window.location.href = 'index.html';
                     return;
                 }
                
@@ -389,12 +391,29 @@
                 }
                 else{
                     alert("Please login in");
+                    window.location.href = 'index.html';
                     return;
                 }
             }
         }
         function logout(){
-            cognitoCredentials.clearCachedId();
+         var data = { UserPoolId : 'us-west-2_boi1yXUkS',
+                            ClientId : '28vv7qns6eobvm2rdvqino0dcu'
+                        };
+            var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+            var cognitoUser = userPool.getCurrentUser();
+
+            if (cognitoUser != null) {
+                  
+                cognitoUser.signOut();
+                window.location.href = 'index.html';
+            }
+            else{
+                alert("Please login in");
+                window.location.href = 'index.html';
+                return;
+            }
+
         }
         </script>
 
@@ -430,7 +449,7 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="index.html" onclick = "logout()">LogOut</a></li>
+                    <li><a onclick = "logout()">LogOut</a></li>
                 </ul>
             </div>
           </div>

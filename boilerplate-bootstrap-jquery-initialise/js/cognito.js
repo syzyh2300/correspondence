@@ -186,7 +186,7 @@ function logout(){
     if (cognitoUser != null) {
           
      cognitoUser.signOut();
-  
+    window.location.href = 'index.html';
     }
     else{
         alert("Please login in");
