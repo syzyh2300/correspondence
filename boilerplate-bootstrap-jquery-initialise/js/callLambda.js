@@ -46,6 +46,7 @@ $(document).on("click", "#submit_newcoorespondence", function(){
     }
     else{
         alert("Please login in");
+        window.location.href = 'index.html';
         return;
     }
 
@@ -264,3 +265,22 @@ function retrivingdata(correspondenceID){
     executeSproc(sprocString, populateForm_callback);
 }
 
+function logout(){
+ var data = { UserPoolId : 'us-west-2_boi1yXUkS',
+                    ClientId : '28vv7qns6eobvm2rdvqino0dcu'
+                };
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+    var cognitoUser = userPool.getCurrentUser();
+
+    if (cognitoUser != null) {
+          
+     cognitoUser.signOut();
+  
+    }
+    else{
+        alert("Please login in");
+        window.location.href = 'index.html';
+        return;
+    }
+
+}

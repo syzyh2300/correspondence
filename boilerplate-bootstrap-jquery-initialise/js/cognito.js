@@ -99,46 +99,46 @@
     
 //   });
 // }
-$(document).on("click", "#register-submit", function(){
-    var firstname = $("#FirstName").val();
-    var familyname = $("#FamilyName").val();
-    var username = $("#email2").val();
-    var password = $("#password2").val();
-    var confirm_password = $("#confirm-password").val();
+// $(document).on("click", "#register-submit", function(){
+//     var firstname = $("#FirstName").val();
+//     var familyname = $("#FamilyName").val();
+//     var username = $("#email2").val();
+//     var password = $("#password2").val();
+//     var confirm_password = $("#confirm-password").val();
 
-    if (password == confirm_password){
-        AWSCognito.config.region = 'us-west-2';
-        var poolData = { UserPoolId : 'us-west-2_boi1yXUkS',
-                        ClientId : '28vv7qns6eobvm2rdvqino0dcu'
-                        };
-        var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
-        var attributeList = [];
-        var datafirstname = {
-                            Name : 'given_name',
-                            Value : firstname
-                        };                   
-        var datafamilyname = {
-                            Name : 'family_name',
-                            Value : familyname
-                        };  
+//     if (password == confirm_password){
+//         AWSCognito.config.region = 'us-west-2';
+//         var poolData = { UserPoolId : 'us-west-2_boi1yXUkS',
+//                         ClientId : '28vv7qns6eobvm2rdvqino0dcu'
+//                         };
+//         var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+//         var attributeList = [];
+//         var datafirstname = {
+//                             Name : 'given_name',
+//                             Value : firstname
+//                         };                   
+//         var datafamilyname = {
+//                             Name : 'family_name',
+//                             Value : familyname
+//                         };  
         
-        var attributefirstname = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(datafirstname);
-        var attributefamilyname = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(datafamilyname);
+//         var attributefirstname = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(datafirstname);
+//         var attributefamilyname = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(datafamilyname);
         
-        attributeList.push(attributefirstname);
-        attributeList.push(attributefamilyname);  
+//         attributeList.push(attributefirstname);
+//         attributeList.push(attributefamilyname);  
              
 
-        userPool.signUp(username, password, attributeList, null, function(err, result){
-            if (err) {
-                alert(err);
-                return;
-            }
-            cognitoUser = result.user;
-            console.log('user name is ' + cognitoUser.getUsername());
-        });    
-    }
-})
+//         userPool.signUp(username, password, attributeList, null, function(err, result){
+//             if (err) {
+//                 alert(err);
+//                 return;
+//             }
+//             cognitoUser = result.user;
+//             console.log('user name is ' + cognitoUser.getUsername());
+//         });    
+//     }
+// })
 $(document).ready(function(){
     var data = { UserPoolId : 'us-west-2_boi1yXUkS',
                     ClientId : '28vv7qns6eobvm2rdvqino0dcu'
@@ -176,6 +176,25 @@ $(document).ready(function(){
     }
 })
 
+function logout(){
+ var data = { UserPoolId : 'us-west-2_boi1yXUkS',
+                    ClientId : '28vv7qns6eobvm2rdvqino0dcu'
+                };
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+    var cognitoUser = userPool.getCurrentUser();
+
+    if (cognitoUser != null) {
+          
+     cognitoUser.signOut();
+  
+    }
+    else{
+        alert("Please login in");
+        window.location.href = 'index.html';
+        return;
+    }
+
+}
 
 function retrivingdata(){
     var id = 1;//in other case this id should be user id in the user table

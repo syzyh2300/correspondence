@@ -96,6 +96,7 @@
 			    }
 			    else{
 			        alert("Please login in");
+			        window.location.href = 'index.html';
 			        return;
 			    }
 
@@ -227,6 +228,7 @@
 			        }
 			        else{
 			            alert("Please login in");
+			            window.location.href = 'index.html';
 			            return;
 			        }
 			       
@@ -261,6 +263,26 @@
 			            location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(s,k,v){p[k]=v})
 			            return k?p[k]:p;
 			}
+
+			function logout(){
+			 var data = { UserPoolId : 'us-west-2_boi1yXUkS',
+			                    ClientId : '28vv7qns6eobvm2rdvqino0dcu'
+			                };
+			    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+			    var cognitoUser = userPool.getCurrentUser();
+
+			    if (cognitoUser != null) {
+			          
+			     cognitoUser.signOut();
+			  
+			    }
+			    else{
+			        alert("Please login in");
+			        window.location.href = 'index.html';
+			        return;
+			    }
+
+			}
     	</script>
 	</head>
 
@@ -279,7 +301,7 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">Sing Out</a></li>
+                    <li><a  onclick = "logout()">LogOut</a></li>
                 </ul>
             </div>
           </div>

@@ -49,6 +49,10 @@
 	        	$('#dateinline').datepicker(options);
                 $('#dateinline').datepicker("setDate", new Date());
 	        })
+
+            function logout(){
+            cognitoCredentials.clearCachedId();
+            }
     	</script>
 	</head>
 
@@ -67,7 +71,7 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">Sing Out</a></li>
+                    <li><a  onclick = "logout()">LogOut</a></li>
                 </ul>
             </div>
           </div>
