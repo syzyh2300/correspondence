@@ -33,6 +33,8 @@
 
 		<!-- datepicker -->
         <script type="text/javascript">
+
+        	//datepicker load inline
 	        $(document).ready( function(){
 
 	        	var options={
@@ -71,6 +73,7 @@
 			    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
 			    var cognitoUser = userPool.getCurrentUser();
 
+			    //check cognito user session
 			    if (cognitoUser != null) {
 			        cognitoUser.getSession(function(err, session) {
 			            if (err) {
@@ -102,6 +105,7 @@
 
 			});
 
+    		//the function to do things to databse via lambda function
 			function insertdata(sprocString,callback){
 
 		        var tsting = sprocString;
@@ -139,17 +143,17 @@
 			                    });
 			            
 			            var pullResults = JSON.parse(data.Payload);
-			            var result = pullResults.respon[0][0];
+			            var result = pullResults.respon[0][0];// files from reading data
 			            var correspondenceid = $('#submit_newresponse').attr("data-correspendence-id"); 
-			            var responseid = result["LAST_INSERT_ID()"];
-			            debugger;
+			            var responseid = result["LAST_INSERT_ID()"]; //last insert response id
 			            for (var i = 0; i < artifacts.length; i++){
 			                
-			                name = artifacts[i].name;
-			                GUID = saveFilesName();
+			                name = artifacts[i].name;// get file name
+			                GUID = saveFilesName(); //get GUID
 			                params = {Key : GUID, Body : artifacts[i], ACL: 'public-read'};
 			                GUID_filename[GUID] = name;
 
+			                //upload files to s3 storage if success, also insert the files details to database
 			                s3.upload (params, function(err,data){
 			                    if(err){
 			                        console.log(err.message);
@@ -164,11 +168,19 @@
 			                    }
 			                })
 			            }
+			        }
+			        else{
+			        	alert("Successful!");
+				        var correspondenceID = getSearchParams("correspondenceID");
+	           			if(correspondenceID){
+				        window.location.href = "Co_Details.html?correspondenceID="+correspondenceID;
+				    	}
 			        }       
 			    }
 
 			}
 
+			//gernal error check also with redirection to the detaills page
 			function generalcheck(err,data){
 			    if (err) { console.log(error);
 			                } 
@@ -179,6 +191,11 @@
 			        var sproc_EventId   = pullResults.respon[0][0].Event_ID;
 			        console.log(sproc_Response);
 			        console.log(sproc_EventId);
+			        alert("Successful!");
+			        var correspondenceID = getSearchParams("correspondenceID");
+           			if(correspondenceID){
+			        window.location.href = "Co_Details.html?correspondenceID="+correspondenceID;
+			    	}
 			    }
 			}
 
@@ -197,6 +214,8 @@
 			}
 
 			$(document).ready(function(){
+
+				//getting the correspondence id from href
 			    var correspondenceID = getSearchParams("correspondenceID");
 			    if(correspondenceID){
 			       $("#submit_newresponse").attr("data-correspendence-id",correspondenceID);
@@ -207,6 +226,7 @@
 			        var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
 			        var cognitoUser = userPool.getCurrentUser();
 
+			        //check the cognito user session
 			        if (cognitoUser != null) {
 			            cognitoUser.getSession(function(err, session) {
 			                if (err) {
@@ -235,12 +255,14 @@
 			   }
 			});
 
+			// calling select_data and check state is 1
 			function retrivingdata(correspondenceID){
 			    var id = correspondenceID;
 			    var sprocString = "call select_data(" +id+ "," +1+ ");";
 			    executeSproc(sprocString, populateForm_callback);
 			}
 
+			//formating the date to dd-mm-yy
 			function getinputdate(date){
 			    var datestring = date.getDate() + "-" + (date.getMonth() + 1) + "-" + (date.getFullYear());
 			    return datestring
@@ -257,13 +279,14 @@
 			    return guid;
 			}
 
-
+			//href params searching 
 			function getSearchParams(k){
 			            var p = {};
 			            location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(s,k,v){p[k]=v})
 			            return k?p[k]:p;
 			}
 
+			// user Log out function and return to the login page, clean the cognito user session
 			function logout(){
 			 var data = { UserPoolId : 'us-west-2_boi1yXUkS',
 			                    ClientId : '28vv7qns6eobvm2rdvqino0dcu'

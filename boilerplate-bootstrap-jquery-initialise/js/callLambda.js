@@ -1,3 +1,4 @@
+// button New correspondence function
 $(document).on("click", "#submit_newcoorespondence", function(){
 
 
@@ -19,8 +20,9 @@ $(document).on("click", "#submit_newcoorespondence", function(){
             ClientId : '28vv7qns6eobvm2rdvqino0dcu'
         };
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
-    var cognitoUser = userPool.getCurrentUser();
+    var cognitoUser = userPool.getCurrentUser();// getting the current user from cashe
 
+    //check cognito user
     if (cognitoUser != null) {
         cognitoUser.getSession(function(err, session) {
             if (err) {
@@ -52,6 +54,7 @@ $(document).on("click", "#submit_newcoorespondence", function(){
 
 });
 
+//lambda function invoke
 function insertdata(sprocString,callback){
 
         var tsting = sprocString;
@@ -69,7 +72,7 @@ function insertdata(sprocString,callback){
 
 }
 
-
+// insert files to database and s3 storage
 function insertfiles(err,data){
     if(err){console.log(err)}
     else{
@@ -99,10 +102,11 @@ function insertfiles(err,data){
             
             for (var i = 0; i < artifacts.length; i++){
                 name = artifacts[i].name;
-                GUID = saveFilesName();
+                GUID = saveFilesName();// get GUID
                 params = {Key : GUID, Body : artifacts[i], ACL: 'public-read'};
                 GUID_filename[GUID] = name;
 
+                //upload to s3 storage
                 s3.upload (params, function(err,data){
                     if(err){
                         console.log(err.message);
@@ -113,6 +117,7 @@ function insertfiles(err,data){
                         name = GUID_filename[data.key];
                         sprocString = "call insert_new_files('" +name+ "','" +GUID+ "'," +correspondenceid+","+responseid+ ","+checkstatus+");";
                         checkstatus++;
+                        //call lambda function and insert files
                         console.log("sprocString: "+ sprocString);
                         executeSproc(sprocString, generalcheck);
                     }
@@ -215,6 +220,7 @@ function getSearchParams(k){
             return k?p[k]:p;
 }
 
+//to retrive data if it has a correspondence id which means if it is a select data form table
 $(document).ready(function(){
     var correspondenceID = getSearchParams("correspondenceID");
     if(correspondenceID){
@@ -265,6 +271,7 @@ function retrivingdata(correspondenceID){
     executeSproc(sprocString, populateForm_callback);
 }
 
+//logout function
 function logout(){
  var data = { UserPoolId : 'us-west-2_boi1yXUkS',
                     ClientId : '28vv7qns6eobvm2rdvqino0dcu'

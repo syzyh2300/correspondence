@@ -99,6 +99,8 @@
     
 //   });
 // }
+
+//***************************************new cognito user reg not using current stage
 // $(document).on("click", "#register-submit", function(){
 //     var firstname = $("#FirstName").val();
 //     var familyname = $("#FamilyName").val();
@@ -139,6 +141,7 @@
 //         });    
 //     }
 // })
+//*************************connecting to the AWS and retriving data
 $(document).ready(function(){
     var data = { UserPoolId : 'us-west-2_boi1yXUkS',
                     ClientId : '28vv7qns6eobvm2rdvqino0dcu'
@@ -164,7 +167,7 @@ $(document).ready(function(){
                                             Logins : AWS_Logins
                                     });
             AWS.config.credentials.get(function(){
-                retrivingdata();
+                retrivingdata();//retriving data
                 
             }); // end credentials.get
         });
@@ -176,6 +179,7 @@ $(document).ready(function(){
     }
 })
 
+//logout function and return to the login page
 function logout(){
  var data = { UserPoolId : 'us-west-2_boi1yXUkS',
                     ClientId : '28vv7qns6eobvm2rdvqino0dcu'
@@ -196,6 +200,7 @@ function logout(){
 
 }
 
+//call select_data procedure and check state is 3
 function retrivingdata(){
     var id = 1;//in other case this id should be user id in the user table
 
@@ -203,6 +208,7 @@ function retrivingdata(){
     executeSproc(sprocString, populateForm_callback);
 }
 
+//lambda function invoke
 function executeSproc(sprocString, callback){
     var tsting = sprocString;
     var AWS_Region = "us-west-2";
@@ -216,6 +222,7 @@ function executeSproc(sprocString, callback){
             callback(error, data);
     }); // end lambda.invoke
 }
+
 
  function populateForm_callback(error, data){
 
@@ -258,7 +265,7 @@ function executeSproc(sprocString, callback){
                 name = singleobject["name"];
                 if(!name){name = "No file"}
                 var cloneCount = i+1;
-
+                //check if it is the second or more file to pop up
                 if(lastid == beforeid){
                     $("#fname1").clone()
                                 .attr('id','fname'+cloneCount)

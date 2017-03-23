@@ -23,11 +23,8 @@
         <script src="js/aws/aws-sdk.min.js"></script>
 
         <script type="text/javascript">
-        function editdata(){
-            document.getElementById("edit1").href = "";
 
-        }
-
+        // get the value after "?" from the href
         function getSearchParams(k){
             var p = {};
             location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(s,k,v){p[k]=v})
