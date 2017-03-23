@@ -146,8 +146,10 @@ $(document).ready(function(){
     var data = { UserPoolId : 'us-west-2_boi1yXUkS',
                     ClientId : '28vv7qns6eobvm2rdvqino0dcu'
                 };
+    //this is the part that defind cognito ID service provider 
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
-    var cognitoUser = userPool.getCurrentUser();
+
+    var cognitoUser = userPool.getCurrentUser();// get user from cache
 
     if (cognitoUser != null) {
         cognitoUser.getSession(function(err, session) {
@@ -185,7 +187,7 @@ function logout(){
                     ClientId : '28vv7qns6eobvm2rdvqino0dcu'
                 };
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
-    var cognitoUser = userPool.getCurrentUser();
+    var cognitoUser = userPool.getCurrentUser();// get current user
 
     if (cognitoUser != null) {
           
@@ -235,16 +237,16 @@ function executeSproc(sprocString, callback){
         var name;
 
         if (result.length ==0){
-
+            // hide the the clone table which is empty and only show the no correspondence
             document.getElementById('CorresTable').style.display = 'none';
         }
         else{
-
+            // hide the table no correspondence 
             document.getElementById('hideNoCorres').style.display = 'none';
 
             for (var i = 0 ; i< result.length; i++){
 
-                var singleobject = result[i];
+                var singleobject = result[i]; //result is the array that contain the selected data
                 var beforeid = -999;
                 if(result[i-1]){beforeid = result[i-1]["Correspondence_ID"];}
                 var lastid = singleobject["Correspondence_ID"];
@@ -258,13 +260,17 @@ function executeSproc(sprocString, callback){
                 var agreeddep = singleobject["AgreedDep"];
                 var reference = singleobject["Reference"];
                 var type = singleobject["Type"];
+                //the href which on click
                 var location = "document.location = 'Co_Details.html?correspondenceID=" + lastid + "'";
+
+                //convert 1 and 0 value from database to open or completed
                 var status = singleobject["Status"];
                 if(status == 1){status = "Open"} else{status = "Completed"};
 
                 name = singleobject["name"];
                 if(!name){name = "No file"}
                 var cloneCount = i+1;
+            
                 //check if it is the second or more file to pop up
                 if(lastid == beforeid){
                     $("#fname1").clone()

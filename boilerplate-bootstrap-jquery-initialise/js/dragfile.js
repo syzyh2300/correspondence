@@ -8,6 +8,8 @@ function onFilesDropped(e){
 	e.preventDefault();
 	var files = e.dataTransfer.files;
 	var total = 0;
+
+	//giving the files to the input function
 	document.getElementById('input4').files = files;
 
 	document.getElementById('filedrop').innerHTML="";
